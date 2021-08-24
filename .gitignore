@@ -1,0 +1,4 @@
+start.sh
+deploy.sh
+credentials.json
+cmd/.env
