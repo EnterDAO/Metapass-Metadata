@@ -48,7 +48,7 @@ func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, config
 		} else {
 			render.JSON(w, r, Error{
 				Status:  404,
-				Message: "No polymorph found"},
+				Message: "No lobster found"},
 			)
 		}
 	}

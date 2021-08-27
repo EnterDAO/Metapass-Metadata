@@ -30,6 +30,6 @@ func TokenMetadata(w http.ResponseWriter, r *http.Request) {
 	ethClient := dlt.ConnectToEthereum()
 	contractAddress := os.Getenv("CONTRACT_ADDRESS")
 
-	configService := config.NewConfigService("./config.json")
+	configService := config.NewConfigService("./serverless_function_source_code/config.json")
 	handlers.HandleMetadataRequest(ethClient, contractAddress, configService)(w, r)
 }
