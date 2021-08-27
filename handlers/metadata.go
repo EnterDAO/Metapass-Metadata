@@ -43,6 +43,18 @@ func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, config
 			return
 		}
 		g := metadata.Genome(genomeInt.String())
-		render.JSON(w, r, (&g).Metadata(tokenId, configService))
+		if g != "0" {
+			render.JSON(w, r, (&g).Metadata(tokenId, configService))
+		} else {
+			render.JSON(w, r, Error{
+				Status:  404,
+				Message: "No polymorph found"},
+			)
+		}
 	}
+}
+
+type Error struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
