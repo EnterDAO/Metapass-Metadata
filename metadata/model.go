@@ -75,20 +75,20 @@ func getBackgroundGene(g string) int {
 func getSkinGene(g string) int {
 	return getGeneInt(g, -8, -4, SKIN_DISITRIBUTION[:])
 }
-func getHeadGene(g string) int {
-	return getGeneInt(g, -12, -8, HEAD_DISTRIBUTION[:])
-}
-func getEyesGene(g string) int {
-	return getGeneInt(g, -16, -12, EYES_DISTRIBUTION[:])
-}
-func getMouthGene(g string) int {
-	return getGeneInt(g, -20, -16, MOUTH_DISTRIBUTION[:])
-}
 func getClothesGene(g string) int {
-	return getGeneInt(g, -24, -20, CLOTHES_DISTRIBUTION[:])
+	return getGeneInt(g, -12, -8, CLOTHES_DISTRIBUTION[:])
 }
 func getHandGene(g string) int {
-	return getGeneInt(g, -28, -24, HAND_DISTRIBUTION[:])
+	return getGeneInt(g, -16, -12, HAND_DISTRIBUTION[:])
+}
+func getHeadGene(g string) int {
+	return getGeneInt(g, -20, -16, HEAD_DISTRIBUTION[:])
+}
+func getMouthGene(g string) int {
+	return getGeneInt(g, -24, -20, MOUTH_DISTRIBUTION[:])
+}
+func getEyesGene(g string) int {
+	return getGeneInt(g, -28, -24, EYES_DISTRIBUTION[:])
 }
 
 func getHeadGeneAttribute(g string, configService *config.ConfigService) StringAttribute {

@@ -33,7 +33,11 @@ func main() {
 	if contractAddress == "" {
 		log.Fatalln("Missing address. Populate in .env")
 	}
-	configService := config.NewConfigService("./config.json")
+	//Debug
+	configService := config.NewConfigService("../config.json")
+
+	//Local + Release
+	// configService := config.NewConfigService("./config.json")
 
 	funcframework.RegisterHTTPFunction("/token", handlers.HandleMetadataRequest(ethClient, contractAddress, configService))
 
