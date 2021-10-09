@@ -8,8 +8,8 @@ import (
 	"github.com/lobster-metadata/config"
 )
 
-const LOBSTER_IMAGE_URL string = "https://storage.googleapis.com/lobster-images/"
-const EXTERNAL_URL string = "https://universe.xyz/polymorphs/"
+const LOBSTER_IMAGE_URL string = "https://storage.googleapis.com/metapass-images/"
+const EXTERNAL_URL string = "https://enterdao.xyz/metapass/"
 const GENES_COUNT = 9
 const BACKGROUND_GENE_COUNT int = 8
 const MOUTH_GENES_COUNT int = 17

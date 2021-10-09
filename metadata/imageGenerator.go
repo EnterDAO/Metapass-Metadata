@@ -14,8 +14,8 @@ import (
 )
 
 const IMG_SIZE = 4000
-const GCLOUD_UPLOAD_BUCKET_NAME = "lobster-images"
-const GCLOUD_SOURCE_BUCKET_NAME = "lobster-source-images"
+const GCLOUD_UPLOAD_BUCKET_NAME = "metapass-images"
+const GCLOUD_SOURCE_BUCKET_NAME = "metapass-source-images"
 
 func imageExists(imageURL string) bool {
 	resp, err := http.Get(imageURL)
