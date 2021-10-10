@@ -1,4 +1,4 @@
-// FINAL COMMANDS FOR NOW:
+// FINAL COMMANDS FOR NOW: 
 // Combine woman with border
 ffmpeg -i ./in/woman.png -i ./in/border.png  -filter_complex "[1][0:v] overlay" ./in/womanWithBorder.png
 
