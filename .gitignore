@@ -5,3 +5,4 @@ cmd/.env
 .env
 .history
 .DS_Store
+cmd/out

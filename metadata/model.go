@@ -8,7 +8,7 @@ import (
 	"github.com/lobster-metadata/config"
 )
 
-const LOBSTER_IMAGE_URL string = "https://storage.googleapis.com/metapass-images/"
+const METAPASS_IMAGE_URL string = "https://storage.googleapis.com/metapass-images/"
 const EXTERNAL_URL string = "https://enterdao.xyz/metapass/"
 const GENES_COUNT = 9
 const BACKGROUND_GENE_COUNT int = 8
@@ -230,23 +230,27 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 
 	b := strings.Builder{}
 
-	b.WriteString(LOBSTER_IMAGE_URL) // Start with base url
+	b.WriteString(METAPASS_IMAGE_URL) // Start with base url
 
 	for _, gene := range genes {
 		b.WriteString(gene)
 	}
 
-	b.WriteString(".jpg") // Finish with jpg extension
+	// b.WriteString(".jpg") // Finish with jpg extension
 
-	imageURL := b.String()
+	geneUrl := b.String()
 
-	imageExists := imageExists(imageURL)
-
+	imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
 	if !imageExists {
 		generateAndSaveImage(genes)
 	}
 
-	m.Image = imageURL
+	videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
+	if !videoExists {
+		generateAndSaveVideo(tokenId, genes)
+	}
+
+	m.Image = geneUrl
 	return m
 }
 

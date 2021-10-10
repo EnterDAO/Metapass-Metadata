@@ -17,7 +17,7 @@ const IMG_SIZE = 4000
 const GCLOUD_UPLOAD_BUCKET_NAME = "metapass-images"
 const GCLOUD_SOURCE_BUCKET_NAME = "metapass-source-images"
 
-func imageExists(imageURL string) bool {
+func resourceExists(imageURL string) bool {
 	resp, err := http.Get(imageURL)
 	if err != nil {
 		log.Fatalln(err)

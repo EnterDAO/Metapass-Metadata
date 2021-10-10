@@ -1,4 +1,4 @@
-package main
+package metadata
 
 import (
 	"image"
@@ -10,7 +10,7 @@ import (
 	"github.com/fogleman/gg"
 )
 
-type Request struct {
+type DrawTokenIdParams struct {
 	BgImgPath string
 	FontPath  string
 	FontSize  float64
@@ -18,8 +18,8 @@ type Request struct {
 	OutputPath string
 }
 
-func TextOnImg(request Request) (image.Image, error) {
-	bgImage, err := gg.LoadImage(request.BgImgPath)
+func DrawTextAndSavePNG(params DrawTokenIdParams) (image.Image, error) {
+	bgImage, err := gg.LoadImage(params.BgImgPath)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func TextOnImg(request Request) (image.Image, error) {
 	dc := gg.NewContext(imgWidth, imgHeight)
 	dc.DrawImage(bgImage, 0, 0)
 
-	if err := dc.LoadFontFace(request.FontPath, request.FontSize); err != nil {
+	if err := dc.LoadFontFace(params.FontPath, params.FontSize); err != nil {
 		return nil, err
 	}
 	//TODO: These shold be reconfigured
@@ -37,8 +37,8 @@ func TextOnImg(request Request) (image.Image, error) {
 	y := float64(40)
 	maxWidth := float64(imgWidth) - 60.0
 	dc.SetColor(color.White)
-	dc.DrawStringWrapped(request.Text, x, y, 0.5, 0.5, maxWidth, 1.5, gg.AlignCenter)
-	dc.SavePNG(request.OutputPath)
+	dc.DrawStringWrapped(params.Text, x, y, 0.5, 0.5, maxWidth, 1.5, gg.AlignCenter)
+	dc.SavePNG(params.OutputPath)
 	return dc.Image(), nil
 }
 
