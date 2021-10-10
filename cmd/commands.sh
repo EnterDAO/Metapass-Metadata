@@ -1,15 +1,16 @@
 // FINAL COMMANDS FOR NOW: 
-// Combine woman with border
-ffmpeg -i ./in/woman.png -i ./in/border.png  -filter_complex "[1][0:v] overlay" ./in/womanWithBorder.png
+// 1. Combine woman with border
+ffmpeg -i ./in/woman.png -i ./in/border-wide.png -filter_complex "[1][0:v] overlay=80:0" ./in/womanWithBorder.png
 
+// 2. Run main.go to add metapass ticket number
 
-// This output video + image
+// 3. Combine video background with image
 ffmpeg -i ./in/background.mp4 -i ./in/womanWithBorder.png \
--filter_complex "[0:v][1:v] overlay=80:0:enable='between(t,0,20)'" \
+-filter_complex "[0:v][1:v] overlay=0:0:enable='between(t,0,20)'" \
 -pix_fmt yuv420p -b:v 2000k \
 ./in/outputBorderNoSound.mp4
 
-// Add sound to video
+// 4. Add sound to video
 ffmpeg -i ./in/outputBorderNoSound.mp4 -i ./in/squidgame.mp3 -map 0:v -map 1:a -c:v copy -shortest ./out/leakage-alert.mp4
 
 // TEST COMMANDS:

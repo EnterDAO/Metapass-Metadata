@@ -2,17 +2,27 @@ package main
 
 import (
 	"fmt"
-
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
+
+// ffmpeg "github.com/u2takey/ffmpeg-go"
 func main() {
 	// ffmpeg -i ./in/woman.png -i ./in/border.png  -filter_complex "[1][0:v] overlay" ./in/womanWithBorder.png
-	womanPng := ffmpeg.Input("./in/woman.png").Get("0")
-	borderPng := ffmpeg.Input("./in/border.png", ffmpeg.KwArgs{"filter_complex": fmt.Sprintf("[1][0:v] overlay")}).
-	Output("./out/testWithCode.png").OverWriteOutput().ErrorToStdOut().Run()
+	// womanPng := ffmpeg.Input("./in/woman.png").Get("0")
+	// borderPng := ffmpeg.Input("./in/border.png", ffmpeg.KwArgs{"filter_complex": fmt.Sprintf("[1][0:v] overlay")}).
+	// Output("./out/testWithCode.png").OverWriteOutput().ErrorToStdOut().Run()
 
+	request := Request{
+		BgImgPath: "./in/womanWithBorder.png",
+		FontPath:  "./font/Poppins/Poppins-Regular.ttf",
+		FontSize:  24,
+		Text:      "Meta Pass #7777",
+		OutputPath: "./in/womanWithBorder.png",
+	}
 
-	fmt.Println(borderPng)
+	_, err := TextOnImg(request)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 // womanPng := ffmpeg.Input("./in/woman.png").Get("0");
