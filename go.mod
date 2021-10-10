@@ -10,4 +10,5 @@ require (
 	github.com/go-chi/render v1.0.1
 	github.com/joho/godotenv v1.3.0
 	github.com/sirupsen/logrus v1.7.0
+	github.com/u2takey/ffmpeg-go v0.3.0
 )

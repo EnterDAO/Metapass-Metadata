@@ -3,3 +3,5 @@ start.sh
 credentials.json
 cmd/.env
 .env
+.history
+.DS_Store
