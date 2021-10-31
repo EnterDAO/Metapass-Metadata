@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -11,24 +10,32 @@ import (
 	"cloud.google.com/go/storage"
 	log "github.com/sirupsen/logrus"
 )
-const inWomanImgPath = "./in/woman.png"
-const inBorderImgPath = "./in/border-wide.png"
-const inBackgroundVideoPath = "./in/background.mp4"
-const inSoundAudioPath = "./in/squidgame.mp3";
 
-const outImagePath = "./out/womanWithBorder.png"
-const outTempVideoPath = "./out/video-no-sound.mp4"
-const outFinalVideoPath = "./out/final.mp4"
+//RELEASE
+const inBackgroundVideoPath = "./serverless_function_source_code/cmd/in/background.mp4"
+const inSoundAudioPath = "./serverless_function_source_code/cmd/in/track.wav";
 
-const fontPath = "./font/Poppins/Poppins-Regular.ttf"
-const fontSize = 24
+const outBackgroundImagePath = "/tmp/background.png"
+const outOverlayedImgPath = "/tmp/overlayed.png"
+const outOverlayedNoBackgroundImgPath = "/tmp/overlayed-no-background.png"
+const outTempVideoPath = "/tmp/video-no-sound.mp4"
+const outFinalVideoPath = "/tmp/video-with-sound.mp4"
 
-func generateAndSaveVideo(tokenId string, genes []string) {
-	// TODO: Get border image based on gene
-	addBorder()
-	addTokenId(tokenId)
+//DEBUG
+// const inBackgroundVideoPath = "./in/background.mp4"
+// const inSoundAudioPath = "./in/track.wav";
+
+// const outBackgroundImagePath = "./out/background.png"
+// const outOverlayedImgPath = "./out/overlayed.png"
+// const outOverlayedNoBackgroundImgPath = "./out/overlayed-no-background.png"
+// const outTempVideoPath = "./out/video-no-sound.mp4"
+// const outFinalVideoPath = "./out/video-with-sound.mp4"
+
+func GenerateAndSaveVideo(genes []string) {
 	addBackground()
+	log.Println("Added trippy background")
 	addAudio()
+	log.Println("Added banger track")
 
 	videoNameBuilder := strings.Builder{}
 	for _, gene := range genes {
@@ -37,50 +44,73 @@ func generateAndSaveVideo(tokenId string, genes []string) {
 
 	videoNameBuilder.WriteString(".mp4")
 
-	saveVideoToGCloud(tokenId, videoNameBuilder.String())
+	saveVideoToGCloud(outFinalVideoPath, videoNameBuilder.String())
 }
 
-func addBorder() {
-		addBorderCommand := exec.Command("ffmpeg", "-y",
-		"-i", inWomanImgPath,
-		"-i", inBorderImgPath,
-		"-filter_complex", "[1][0:v] overlay=80:0", 
-		outImagePath)
- 
-	 err := addBorderCommand.Run()
-	 if err != nil {
-		 fmt.Println(err.Error())
-	 }
-}
+func overlayTraits(traitPaths []string) {
+	// ffmpeg -y -i ./in/background.mp4 -vf "select=eq(n\,1)" -vframes 1 background.png
+	// ffmpeg -i ./in/blue-fur.png -i ./in/shark-teeth-chain.png -i ./in/black-gas-mask.png -i ./in/cat-eyes.png -i ./in/daimunds.png -filter_complex "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[v]" -map "[v]" ./out/combined.png
+	// ffmpeg -i ./in/woman.png -i ./in/shark-teeth-chain.png -i ./in/gas-mask.png -i ./in/glasses.png -i ./in/eth.png -filter_complex "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[v]" -map "[v]" ./out/combined2.png
+	extractBackgroundFrame := exec.Command("ffmpeg", "-y",
+		"-i", inBackgroundVideoPath, 
+		"-vf", "select=eq(n\\,1)",
+		"-vframes", "1",
+		outBackgroundImagePath,
+	)
 
-func addTokenId(tokenId string) {
-	params := DrawTokenIdParams{
-		BgImgPath: outImagePath,
-		FontPath:  fontPath,
-		FontSize:  fontSize,
-		Text:      fmt.Sprintf("Meta Pass #%s", tokenId),
-		OutputPath: outImagePath,
+	err := extractBackgroundFrame.Run()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	// First time we include the background frame to have the full image
+	overlayParams := []string{}
+	overlayParams = append(overlayParams, "-y")
+	overlayParams = append(overlayParams, "-i", outBackgroundImagePath)
+	for i := 0; i < len(traitPaths); i++ {
+		overlayParams = append(overlayParams, "-i")
+		overlayParams = append(overlayParams, traitPaths[i])
+	}
+	overlayParams = append(overlayParams, "-filter_complex", "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[bg3];[bg3][5]overlay[v]", "-map", "[v]", outOverlayedImgPath)
+	overlayCommand := exec.Command("ffmpeg", overlayParams...)
+
+	err = overlayCommand.Run()
+	if err != nil {
+		log.Fatalf(err.Error())
 	}
 
-	_, err := DrawTextAndSavePNG(params)
+	// Second time we exclude the background in order to overlay the real video
+	overlayParams = []string{}
+	overlayParams = append(overlayParams, "-y")
+	for i := 0; i < len(traitPaths); i++ {
+		overlayParams = append(overlayParams, "-i")
+		overlayParams = append(overlayParams, traitPaths[i])
+	}
+	overlayParams = append(overlayParams, "-filter_complex", "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[v]", "-map", "[v]", outOverlayedNoBackgroundImgPath)
+	overlayCommand = exec.Command("ffmpeg", overlayParams...)
 
+	err = overlayCommand.Run()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf(err.Error())
 	}
 }
 
 func addBackground() {
+	// ffmpeg -stream_loop 10 -y -i ./in/background.mp4 -framerate 30 -i ./in/woman.png -filter_complex [0]overlay=x=0:y=0[out] -map [out] -map 0:a? -pix_fmt yuv420p -crf 23 ./out/video-no-sound-compressed.mp4
 	toVideo := exec.Command("ffmpeg", "-y",
+	"-stream_loop", "10",
 	"-i", inBackgroundVideoPath,
-	"-i", outImagePath, 
-	"-filter_complex", "[0:v][1:v] overlay=0:0:enable='between(t,0,20)'",
+	"-framerate", "30",
+	"-i", outOverlayedNoBackgroundImgPath, 
+	"-filter_complex", "[0]overlay=x=0:y=0[out]",
+	"-map", "[out]",
+	"-map", "0:a?",
 	"-pix_fmt", "yuv420p",
-	"-b:v", "2000k",
+	"-crf", "23",
 	outTempVideoPath)
 
 	err := toVideo.Run()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Fatalf(err.Error())
 	}
 }
 
@@ -90,38 +120,35 @@ func addAudio() {
 	"-i", inSoundAudioPath, 
 	"-map", "0:v",
 	"-map", "1:a",
-	"-b:v", "2000k",
+	"-crf", "23",
 	"-c:v", "copy",
 	"-shortest",
 	outFinalVideoPath)
 
 	err := addAudio.Run()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Fatalf(err.Error())
 	}
 }
 
-func saveVideoToGCloud(tokenId string, fileName string) {
-	file, err := os.Open(outFinalVideoPath)
+func saveVideoToGCloud(filePath string, fileName string) {
+	file, err := os.Open(filePath)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf(err.Error())
 	}
+	log.Println("Opened file for upload")
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 
 	if err != nil {
-		log.Errorf("storage.NewClient: %v", err)
+		log.Fatalf("storage.NewClient: %v", err)
 	}
 	defer client.Close()
 
 	bucket := client.Bucket(GCLOUD_UPLOAD_BUCKET_NAME).Object(fileName).NewWriter(ctx)
 
 	if _, err := io.Copy(bucket, file); err != nil {
-		log.Errorf("io.Copy: %v", err)
-	}
-
-	if err != nil {
-		log.Errorf("Upload: %v", err)
+		log.Fatalf("io.Copy: %v", err)
 	}
 
 	if err = bucket.Close(); err != nil {

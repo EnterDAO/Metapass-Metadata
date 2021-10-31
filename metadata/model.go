@@ -236,21 +236,20 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 		b.WriteString(gene)
 	}
 
-	// b.WriteString(".jpg") // Finish with jpg extension
-
 	geneUrl := b.String()
 
 	imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
 	if !imageExists {
-		generateAndSaveImage(genes)
+		GenerateAndSaveImage(genes)
 	}
 
 	videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
 	if !videoExists {
-		generateAndSaveVideo(tokenId, genes)
+		GenerateAndSaveVideo(genes)
 	}
 
-	m.Image = geneUrl
+	m.Image = geneUrl + ".jpg"
+	m.Video = geneUrl + ".mp4"
 	return m
 }
 
@@ -258,6 +257,7 @@ type Metadata struct {
 	Description string      `json:"description"`
 	Name        string      `json:"name"`
 	Image       string      `json:"image"`
+	Video       string      `json:"video"`
 	Attributes  interface{} `json:"attributes"`
 	ExternalUrl string      `json:"external_url"`
 }

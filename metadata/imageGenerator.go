@@ -2,7 +2,6 @@ package metadata
 
 import (
 	"context"
-	"fmt"
 	"image"
 	"image/color"
 	"net/http"
@@ -20,7 +19,7 @@ const GCLOUD_SOURCE_BUCKET_NAME = "metapass-source-images"
 func resourceExists(imageURL string) bool {
 	resp, err := http.Get(imageURL)
 	if err != nil {
-		log.Fatalln(err)
+		log.Error(err)
 	}
 
 	return resp.StatusCode != 404
@@ -76,10 +75,7 @@ func saveToGCloud(i *image.NRGBA, name string) {
 	defer client.Close()
 
 	bucket := client.Bucket(GCLOUD_UPLOAD_BUCKET_NAME).Object(name).NewWriter(ctx)
-	// f, err := imaging.FormatFromFilename(name)
-	// if err != nil {
-	// 	log.Errorf("Format from filename: %v", err)
-	// }
+
 	err = imaging.Encode(bucket, i, imaging.JPEG, imaging.JPEGQuality(80))
 
 	if err != nil {
@@ -92,27 +88,13 @@ func saveToGCloud(i *image.NRGBA, name string) {
 
 }
 
-func generateAndSaveImage(genes []string) {
-	// Reverse
-	// revGenes := reverseGenesOrder(genes)
-
-	f := make([]string, len(genes))
-
-	for i, gene := range genes {
-		f[i] = fmt.Sprintf("./%v/%s.png", i, gene)
-	}
-
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
-
-	if err != nil {
-		log.Errorf("storage.NewClient: %v", err)
-	}
-	defer client.Close()
-
-	bucket := client.Bucket(GCLOUD_SOURCE_BUCKET_NAME)
-
-	i := combineRemoteImages(bucket, f[0], f[1:]...)
+func GenerateAndSaveImage(genes []string) {
+	// RELEASE: 
+	overlayTraits([]string{"./serverless_function_source_code/cmd/in/blue-fur.png", "./serverless_function_source_code/cmd/in/shark-teeth-chain.png", "./serverless_function_source_code/cmd/in/black-gas-mask.png", "./serverless_function_source_code/cmd/in/cat-eyes.png", "./serverless_function_source_code/cmd/in/daimunds.png"})
+	
+	// DEBUG:
+	// overlayTraits([]string{"./in/blue-fur.png", "./in/shark-teeth-chain.png", "./in/black-gas-mask.png", "./in/cat-eyes.png", "./in/daimunds.png"})
+	log.Println("Overlayed images")
 
 	b := strings.Builder{}
 
@@ -122,5 +104,5 @@ func generateAndSaveImage(genes []string) {
 
 	b.WriteString(".jpg") // Finish with jpg extension
 
-	saveToGCloud(i, b.String())
+	saveVideoToGCloud(outOverlayedImgPath, b.String())
 }

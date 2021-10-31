@@ -35,9 +35,9 @@ func main() {
 	}
 	//Debug
 	configService := config.NewConfigService("../config.json")
-
-	//Local + Release
-	// configService := config.NewConfigService("./config.json")
+	// genes := []string{"2"}
+	// metadata.GenerateAndSaveImage(genes)
+	// metadata.GenerateAndSaveVideo(genes)
 
 	funcframework.RegisterHTTPFunction("/token", handlers.HandleMetadataRequest(ethClient, contractAddress, configService))
 
