@@ -12,24 +12,38 @@ import (
 )
 
 //RELEASE
-const inBackgroundVideoPath = "./serverless_function_source_code/cmd/in/background.mp4"
-const inSoundAudioPath = "./serverless_function_source_code/cmd/in/track.wav";
+// const inBackgroundVideoPath = "./serverless_function_source_code/cmd/in/background.mp4"
+// const inSoundAudioPath = "./serverless_function_source_code/cmd/in/track.wav";
 
-const outBackgroundImagePath = "/tmp/background.png"
-const outOverlayedImgPath = "/tmp/overlayed.png"
-const outOverlayedNoBackgroundImgPath = "/tmp/overlayed-no-background.png"
-const outTempVideoPath = "/tmp/video-no-sound.mp4"
-const outFinalVideoPath = "/tmp/video-with-sound.mp4"
+// const outBackgroundImagePath = "/tmp/background.png"
+// const outOverlayedImgPath = "/tmp/overlayed.png"
+// const outOverlayedNoBackgroundImgPath = "/tmp/overlayed-no-background.png"
+// const outTempVideoPath = "/tmp/video-no-sound.mp4"
+// const outFinalVideoPath = "/tmp/video-with-sound.mp4"
+// var traitsToCombine = []string{
+// 	"./serverless_function_source_code/cmd/in/pierced.png",
+// 	"./serverless_function_source_code/cmd/in/leather-necklace.png",
+// 	"./serverless_function_source_code/cmd/in/black-mouth.png",
+// 	"./serverless_function_source_code/cmd/in/melting-eyes.png",
+// 	"./serverless_function_source_code/cmd/in/eth.png",
+// }
 
 //DEBUG
-// const inBackgroundVideoPath = "./in/background.mp4"
-// const inSoundAudioPath = "./in/track.wav";
+const inBackgroundVideoPath = "./in/background.mp4"
+const inSoundAudioPath = "./in/track.wav";
 
-// const outBackgroundImagePath = "./out/background.png"
-// const outOverlayedImgPath = "./out/overlayed.png"
-// const outOverlayedNoBackgroundImgPath = "./out/overlayed-no-background.png"
-// const outTempVideoPath = "./out/video-no-sound.mp4"
-// const outFinalVideoPath = "./out/video-with-sound.mp4"
+const outBackgroundImagePath = "./out/background.png"
+const outOverlayedImgPath = "./out/overlayed.png"
+const outOverlayedNoBackgroundImgPath = "./out/overlayed-no-background.png"
+const outTempVideoPath = "./out/video-no-sound.mp4"
+const outFinalVideoPath = "./out/video-with-sound.mp4"
+var traitsToCombine = []string{
+	"./in/pierced.png",
+	"./in/leather-necklace.png",
+	"./in/black-mouth.png",
+	"./in/melting-eyes.png",
+	"./in/eth.png",
+}
 
 func GenerateAndSaveVideo(genes []string) {
 	addBackground()
@@ -95,7 +109,7 @@ func overlayTraits(traitPaths []string) {
 }
 
 func addBackground() {
-	// ffmpeg -stream_loop 10 -y -i ./in/background.mp4 -framerate 30 -i ./in/woman.png -filter_complex [0]overlay=x=0:y=0[out] -map [out] -map 0:a? -pix_fmt yuv420p -crf 23 ./out/video-no-sound-compressed.mp4
+	// ffmpeg -y -i ./in/background.mp4 -framerate 30 -i ./out/combined.png -filter_complex [0]overlay=x=0:y=0[out] -map [out] -map 0:a? -tag:v hvc1 -vcodec libx265 -pix_fmt yuv420p ./out/video-no-sound-compressed.mp4
 	toVideo := exec.Command("ffmpeg", "-y",
 	"-stream_loop", "10",
 	"-i", inBackgroundVideoPath,
@@ -104,8 +118,9 @@ func addBackground() {
 	"-filter_complex", "[0]overlay=x=0:y=0[out]",
 	"-map", "[out]",
 	"-map", "0:a?",
+	"-tag:v", "hvc1",
+	"-vcodec", "libx265",
 	"-pix_fmt", "yuv420p",
-	"-crf", "23",
 	outTempVideoPath)
 
 	err := toVideo.Run()
@@ -115,12 +130,12 @@ func addBackground() {
 }
 
 func addAudio() {
+	// ffmpeg -y -i ./out/video-no-sound-compressed.mp4 -i ./in/track.wav -map 0:v -map 1:a -c:v copy -shortest ./out/final.mp4
 	addAudio := exec.Command("ffmpeg", "-y",
 	"-i", outTempVideoPath,
 	"-i", inSoundAudioPath, 
 	"-map", "0:v",
 	"-map", "1:a",
-	"-crf", "23",
 	"-c:v", "copy",
 	"-shortest",
 	outFinalVideoPath)

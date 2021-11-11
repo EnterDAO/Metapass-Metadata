@@ -89,11 +89,7 @@ func saveToGCloud(i *image.NRGBA, name string) {
 }
 
 func GenerateAndSaveImage(genes []string) {
-	// RELEASE: 
-	overlayTraits([]string{"./serverless_function_source_code/cmd/in/blue-fur.png", "./serverless_function_source_code/cmd/in/shark-teeth-chain.png", "./serverless_function_source_code/cmd/in/black-gas-mask.png", "./serverless_function_source_code/cmd/in/cat-eyes.png", "./serverless_function_source_code/cmd/in/daimunds.png"})
-	
-	// DEBUG:
-	// overlayTraits([]string{"./in/blue-fur.png", "./in/shark-teeth-chain.png", "./in/black-gas-mask.png", "./in/cat-eyes.png", "./in/daimunds.png"})
+	overlayTraits(traitsToCombine)
 	log.Println("Overlayed images")
 
 	b := strings.Builder{}
