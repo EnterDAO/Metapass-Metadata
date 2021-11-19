@@ -16,7 +16,6 @@ import (
 
 func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, configService *config.ConfigService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		instance, err := contracts.NewLobster(common.HexToAddress(address), ethClient.Client)
 		if err != nil {
 			render.Status(r, 500)

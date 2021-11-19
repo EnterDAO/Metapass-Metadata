@@ -1,7 +1,9 @@
 package metadata
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -12,45 +14,61 @@ import (
 )
 
 //RELEASE
-// const inBackgroundVideoPath = "./serverless_function_source_code/cmd/in/background.mp4"
-// const inSoundAudioPath = "./serverless_function_source_code/cmd/in/track.wav";
+const inBackgroundVideoPath = "./serverless_function_source_code/cmd/in/background.mp4"
+const inSoundAudioPath = "./serverless_function_source_code/cmd/in/track.wav";
 
-// const outBackgroundImagePath = "/tmp/background.png"
-// const outOverlayedImgPath = "/tmp/overlayed.png"
-// const outOverlayedNoBackgroundImgPath = "/tmp/overlayed-no-background.png"
-// const outTempVideoPath = "/tmp/video-no-sound.mp4"
-// const outFinalVideoPath = "/tmp/video-with-sound.mp4"
+const outBackgroundImagePath = "/tmp/background.png"
+const outOverlayedImgPath = "/tmp/overlayed.png"
+const outOverlayedNoBackgroundImgPath = "/tmp/overlayed-no-background.png"
+const outTempVideoPath = "/tmp/video-no-sound.mp4"
+const outFinalVideoPath = "/tmp/video-with-sound.mp4"
+var traitsToCombine = []string{
+	"./serverless_function_source_code/cmd/in/pierced.png",
+	"./serverless_function_source_code/cmd/in/leather-necklace.png",
+	"./serverless_function_source_code/cmd/in/black-mouth.png",
+	"./serverless_function_source_code/cmd/in/melting-eyes.png",
+	"./serverless_function_source_code/cmd/in/eth.png",
+}
+
+// LOCAL RUN
+// const inBackgroundVideoPath = "./cmd/in/background.mp4"
+// const inSoundAudioPath = "./cmd/in/track.wav";
+
+// const outBackgroundImagePath = "./cmd/out/background.png"
+// const outOverlayedImgPath = "./cmd/out/overlayed.png"
+// const outOverlayedNoBackgroundImgPath = "./cmd/out/overlayed-no-background.png"
+// const outTempVideoPath = "./cmd/out/video-no-sound.mp4"
+// const outFinalVideoPath = "./cmd/out/video-with-sound.mp4"
 // var traitsToCombine = []string{
-// 	"./serverless_function_source_code/cmd/in/pierced.png",
-// 	"./serverless_function_source_code/cmd/in/leather-necklace.png",
-// 	"./serverless_function_source_code/cmd/in/black-mouth.png",
-// 	"./serverless_function_source_code/cmd/in/melting-eyes.png",
-// 	"./serverless_function_source_code/cmd/in/eth.png",
+// 	"./cmd/in/pierced.png",
+// 	"./cmd/in/leather-necklace.png",
+// 	"./cmd/in/black-mouth.png",
+// 	"./cmd/in/melting-eyes.png",
+// 	"./cmd/in/eth.png",
 // }
 
 //DEBUG
-const inBackgroundVideoPath = "./in/background.mp4"
-const inSoundAudioPath = "./in/track.wav";
+// const inBackgroundVideoPath = "./in/background.mp4"
+// const inSoundAudioPath = "./in/track.wav";
 
-const outBackgroundImagePath = "./out/background.png"
-const outOverlayedImgPath = "./out/overlayed.png"
-const outOverlayedNoBackgroundImgPath = "./out/overlayed-no-background.png"
-const outTempVideoPath = "./out/video-no-sound.mp4"
-const outFinalVideoPath = "./out/video-with-sound.mp4"
-var traitsToCombine = []string{
-	"./in/pierced.png",
-	"./in/leather-necklace.png",
-	"./in/black-mouth.png",
-	"./in/melting-eyes.png",
-	"./in/eth.png",
-}
+// const outBackgroundImagePath = "./out/background.png"
+// const outOverlayedImgPath = "./out/overlayed.png"
+// const outOverlayedNoBackgroundImgPath = "./out/overlayed-no-background.png"
+// const outTempVideoPath = "./out/video-no-sound.mp4"
+// const outFinalVideoPath = "./out/video-with-sound.mp4"
+// var traitsToCombine = []string{
+// 	"./in/pierced.png",
+// 	"./in/leather-necklace.png",
+// 	"./in/black-mouth.png",
+// 	"./in/melting-eyes.png",
+// 	"./in/eth.png",
+// }
 
 func GenerateAndSaveVideo(genes []string) {
 	addBackground()
 	log.Println("Added trippy background")
 	addAudio()
 	log.Println("Added banger track")
-
 	videoNameBuilder := strings.Builder{}
 	for _, gene := range genes {
 		videoNameBuilder.WriteString(gene)
@@ -87,9 +105,14 @@ func overlayTraits(traitPaths []string) {
 	overlayParams = append(overlayParams, "-filter_complex", "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[bg3];[bg3][5]overlay[v]", "-map", "[v]", outOverlayedImgPath)
 	overlayCommand := exec.Command("ffmpeg", overlayParams...)
 
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	overlayCommand.Stdout = &out
+	overlayCommand.Stderr = &stderr
 	err = overlayCommand.Run()
 	if err != nil {
-		log.Fatalf(err.Error())
+    fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+    return
 	}
 
 	// Second time we exclude the background in order to overlay the real video
@@ -102,16 +125,18 @@ func overlayTraits(traitPaths []string) {
 	overlayParams = append(overlayParams, "-filter_complex", "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[v]", "-map", "[v]", outOverlayedNoBackgroundImgPath)
 	overlayCommand = exec.Command("ffmpeg", overlayParams...)
 
+	overlayCommand.Stdout = &out
+	overlayCommand.Stderr = &stderr
 	err = overlayCommand.Run()
 	if err != nil {
-		log.Fatalf(err.Error())
+    fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+    return
 	}
 }
 
 func addBackground() {
 	// ffmpeg -y -i ./in/background.mp4 -framerate 30 -i ./out/combined.png -filter_complex [0]overlay=x=0:y=0[out] -map [out] -map 0:a? -tag:v hvc1 -vcodec libx265 -pix_fmt yuv420p ./out/video-no-sound-compressed.mp4
 	toVideo := exec.Command("ffmpeg", "-y",
-	"-stream_loop", "10",
 	"-i", inBackgroundVideoPath,
 	"-framerate", "30",
 	"-i", outOverlayedNoBackgroundImgPath, 
@@ -123,9 +148,14 @@ func addBackground() {
 	"-pix_fmt", "yuv420p",
 	outTempVideoPath)
 
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	toVideo.Stdout = &out
+	toVideo.Stderr = &stderr
 	err := toVideo.Run()
 	if err != nil {
-		log.Fatalf(err.Error())
+    fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+    return
 	}
 }
 
@@ -140,9 +170,14 @@ func addAudio() {
 	"-shortest",
 	outFinalVideoPath)
 
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	addAudio.Stdout = &out
+	addAudio.Stderr = &stderr
 	err := addAudio.Run()
 	if err != nil {
-		log.Fatalf(err.Error())
+    fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+    return
 	}
 }
 

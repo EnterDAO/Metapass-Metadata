@@ -10,11 +10,11 @@ import (
 type ConfigService struct {
 	Skin       []string `json:"skin"`
 	Background []string `json:"background"`
-	Clothes    []string `json:"clothes"`
-	Hand       []string `json:"hand"`
 	Mouth      []string `json:"mouth"`
 	Eyes       []string `json:"eyes"`
-	Head       []string `json:"head"`
+	Track			 []string `json:"track"`
+	Vortex		 []string `json:"vortex"`
+	Necklace	 []string `json:"necklace"`
 }
 
 func NewConfigService(configPath string) *ConfigService {

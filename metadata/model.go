@@ -10,22 +10,23 @@ import (
 
 const METAPASS_IMAGE_URL string = "https://storage.googleapis.com/metapass-images/"
 const EXTERNAL_URL string = "https://enterdao.xyz/metapass/"
-const GENES_COUNT = 9
-const BACKGROUND_GENE_COUNT int = 8
-const MOUTH_GENES_COUNT int = 17
-const SKIN_GENES_COUNT int = 18
-const HAND_GENES_COUNT int = 25
-const CLOTHES_GENES_COUNT int = 20
-const EYES_GENES_COUNT int = 23
-const HEAD_GENES_COUNT int = 22
+const GENES_COUNT = 7
 
-var SKIN_DISITRIBUTION [SKIN_GENES_COUNT]int = [SKIN_GENES_COUNT]int{1750, 1750, 1750, 1500, 750, 500, 400, 350, 300, 250, 175, 150, 125, 100, 65, 50, 25, 10}
-var CLOTHES_DISTRIBUTION [CLOTHES_GENES_COUNT]int = [CLOTHES_GENES_COUNT]int{1750, 1750, 1500, 1000, 850, 500, 450, 400, 350, 300, 250, 200, 175, 150, 125, 100, 65, 50, 25, 10}
-var HAND_DISTRIBUTION [HAND_GENES_COUNT]int = [HAND_GENES_COUNT]int{1150, 1000, 1000, 850, 750, 650, 600, 550, 500, 450, 400, 350, 300, 250, 225, 200, 175, 150, 125, 100, 75, 65, 50, 25, 10}
-var MOUTH_DISTRIBUTION [MOUTH_GENES_COUNT]int = [MOUTH_GENES_COUNT]int{1350, 1250, 1150, 1050, 950, 850, 750, 650, 550, 450, 350, 250, 150, 100, 75, 50, 25}
-var EYES_DISTRIBUTION [EYES_GENES_COUNT]int = [EYES_GENES_COUNT]int{1400, 1300, 1200, 1000, 850, 700, 600, 500, 450, 400, 350, 250, 200, 175, 150, 125, 100, 75, 55, 45, 35, 25, 15}
-var HEAD_DISTRIBUTION [HEAD_GENES_COUNT]int = [HEAD_GENES_COUNT]int{750, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 600, 550, 400, 325, 250, 200, 150, 100, 50, 25}
-var BACKGROUND_DISTRIBUTION [BACKGROUND_GENE_COUNT]int = [BACKGROUND_GENE_COUNT]int{1250, 1250, 1250, 1250, 1250, 1250, 1250, 1250}
+const SKIN_GENE_COUNT int = 8
+const MOUTH_GENE_COUNT int = 4
+const NECKLACES_GENE_COUNT int = 5
+const EYES_GENES_COUNT int = 8
+const TRACKS_GENES_COUNT int = 10
+const BACKGROUND_GENE_COUNT int = 10
+const VORTEX_GENE_COUNT = 3
+
+var SKIN_DISITRIBUTION [SKIN_GENE_COUNT]int = [SKIN_GENE_COUNT]int{1250,1250,1250,1250,1250,1250,1250,1250}
+var MOUTH_DISITRIBUTION [MOUTH_GENE_COUNT]int = [MOUTH_GENE_COUNT]int{2500,2500,2500,2500}
+var NECKLACES_DISTRIBUTION [NECKLACES_GENE_COUNT]int = [NECKLACES_GENE_COUNT]int{2000,2000,2000,2000,2000}
+var EYES_DISTRIBUTION [EYES_GENES_COUNT]int = [EYES_GENES_COUNT]int{1250,1250,1250,1250,1250,1250,1250,1250}
+var TRACKS_DISTRIBUTION [TRACKS_GENES_COUNT]int = [TRACKS_GENES_COUNT]int{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000}
+var BACKGROUND_DISTRIBUTION [BACKGROUND_GENE_COUNT]int = [BACKGROUND_GENE_COUNT]int{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000}
+var VORTEX_DISTRIBUTION [VORTEX_GENE_COUNT]int = [VORTEX_GENE_COUNT]int{3333,3333,3334}
 
 type Genome string
 type Gene int
@@ -69,35 +70,68 @@ func getGeneInt(g string, start, end int, traitDistributions []int) int {
 
 	return traitIdx
 }
+
+// BACKGROUND_DISTRIBUTION
 func getBackgroundGene(g string) int {
 	return getGeneInt(g, -4, 0, BACKGROUND_DISTRIBUTION[:])
 }
+// SKIN_DISITRIBUTION
 func getSkinGene(g string) int {
 	return getGeneInt(g, -8, -4, SKIN_DISITRIBUTION[:])
 }
-func getClothesGene(g string) int {
-	return getGeneInt(g, -12, -8, CLOTHES_DISTRIBUTION[:])
+// NECKLACES_DISTRIBUTION
+func getNecklaceGene(g string) int {
+	return getGeneInt(g, -12, -8, NECKLACES_DISTRIBUTION[:])
 }
-func getHandGene(g string) int {
-	return getGeneInt(g, -16, -12, HAND_DISTRIBUTION[:])
-}
-func getHeadGene(g string) int {
-	return getGeneInt(g, -20, -16, HEAD_DISTRIBUTION[:])
-}
+// MOUTH_DISITRIBUTION
 func getMouthGene(g string) int {
-	return getGeneInt(g, -24, -20, MOUTH_DISTRIBUTION[:])
+	return getGeneInt(g, -16, -12, MOUTH_DISITRIBUTION[:])
 }
+// EYES_DISTRIBUTION
 func getEyesGene(g string) int {
-	return getGeneInt(g, -28, -24, EYES_DISTRIBUTION[:])
+	return getGeneInt(g, -20, -16, EYES_DISTRIBUTION[:])
+}
+// VORTEX_DISTRIBUTION
+func getVortexGene(g string) int {
+	return getGeneInt(g, -24, -20, VORTEX_DISTRIBUTION[:])
+}
+// TRACKS_DISTRIBUTION
+func getTrackGene(g string) int {
+	return getGeneInt(g, -28, -24, TRACKS_DISTRIBUTION[:])
 }
 
-func getHeadGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
-	gene := getHeadGene(g)
+func getMouthGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
+	gene := getMouthGene(g)
 	return StringAttribute{
-		TraitType: "Head",
-		Value:     configService.Head[gene],
+		TraitType: "Mouth",
+		Value:     configService.Mouth[gene],
 	}
 }
+
+func getTrackGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
+	gene := getTrackGene(g)
+	return StringAttribute{
+		TraitType: "Track",
+		Value:     configService.Track[gene],
+	}
+}
+
+func getVortexGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
+	gene := getVortexGene(g)
+	return StringAttribute{
+		TraitType: "Vortex",
+		Value:     configService.Vortex[gene],
+	}
+}
+
+func getNecklaceGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
+	gene := getNecklaceGene(g)
+	return StringAttribute{
+		TraitType: "Necklace",
+		Value:     configService.Necklace[gene],
+	}
+}
+
 func getEyesGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
 	gene := getEyesGene(g)
 	return StringAttribute{
@@ -112,39 +146,12 @@ func getSkinGeneAttribute(g string, configService *config.ConfigService) StringA
 		Value:     configService.Skin[gene],
 	}
 }
-func getClothesGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
-	gene := getClothesGene(g)
-	return StringAttribute{
-		TraitType: "Clothes",
-		Value:     configService.Clothes[gene],
-	}
-}
-func getHandGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
-	gene := getHandGene(g)
-	return StringAttribute{
-		TraitType: "Hand",
-		Value:     configService.Hand[gene],
-	}
-}
 func getBackgroundGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
 	gene := getBackgroundGene(g)
 	return StringAttribute{
 		TraitType: "Background",
 		Value:     configService.Background[gene],
 	}
-}
-
-func getMouthGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
-	gene := getMouthGene(g)
-	return StringAttribute{
-		TraitType: "Mouth",
-		Value:     configService.Mouth[gene],
-	}
-}
-
-func getHeadGenePath(g string) string {
-	gene := getHeadGene(g)
-	return Gene(gene).toPath()
 }
 
 func getEyesGenePath(g string) string {
@@ -157,36 +164,36 @@ func getSkinGenePath(g string) string {
 	return Gene(gene).toPath()
 }
 
-func getClothesGenePath(g string) string {
-	gene := getClothesGene(g)
-	return Gene(gene).toPath()
-}
-
-func getHandGenePath(g string) string {
-	gene := getHandGene(g)
-	return Gene(gene).toPath()
-}
-
-func getBackgroundGenePath(g string) string {
-	gene := getBackgroundGene(g)
-	return Gene(gene).toPath()
-}
-
 func getMouthGenePath(g string) string {
 	gene := getMouthGene(g)
 	return Gene(gene).toPath()
 }
 
+func getNecklaceGenePath(g string) string {
+	gene := getNecklaceGene(g)
+	return Gene(gene).toPath()
+}
+
+func getTrackGenePath(g string) string {
+	gene := getTrackGene(g)
+	return Gene(gene).toPath()
+}
+
+func getVortexGenePath(g string) string {
+	gene := getVortexGene(g)
+	return Gene(gene).toPath()
+}
+func getBackgroundGenePath(g string) string {
+	gene := getBackgroundGene(g)
+	return Gene(gene).toPath()
+}
+
 func (g *Genome) name(configService *config.ConfigService, tokenId string) string {
-	gStr := string(*g)
-	gene := getSkinGene(gStr)
-	return fmt.Sprintf("%v Lobby Lobster #%v", configService.Skin[gene], tokenId)
+	return fmt.Sprintf("Sharded Mind #%v", tokenId)
 }
 
 func (g *Genome) description(configService *config.ConfigService, tokenId string) string {
-	gStr := string(*g)
-	gene := getSkinGene(gStr)
-	return fmt.Sprintf("The %v Lobby Lobster #%v is a citizen of the Polymorph Universe and has a unique genetic code!", configService.Skin[gene], tokenId)
+	return fmt.Sprintf("Sharded Minds is the most dope NFT collection!")
 }
 
 func (g *Genome) genes() []string {
@@ -196,11 +203,11 @@ func (g *Genome) genes() []string {
 
 	res = append(res, getBackgroundGenePath(gStr))
 	res = append(res, getSkinGenePath(gStr))
-	res = append(res, getClothesGenePath(gStr))
-	res = append(res, getHandGenePath(gStr))
-	res = append(res, getHeadGenePath(gStr))
-	res = append(res, getEyesGenePath(gStr))
+	res = append(res, getNecklaceGenePath(gStr))
 	res = append(res, getMouthGenePath(gStr))
+	res = append(res, getEyesGenePath(gStr))
+	res = append(res, getVortexGenePath(gStr))
+	res = append(res, getTrackGenePath(gStr))
 
 	return res
 }
@@ -209,12 +216,12 @@ func (g *Genome) attributes(configService *config.ConfigService) []interface{} {
 	gStr := string(*g)
 
 	res := []interface{}{}
-	res = append(res, getMouthGeneAttribute(gStr, configService))
-	res = append(res, getSkinGeneAttribute(gStr, configService))
-	res = append(res, getHandGeneAttribute(gStr, configService))
-	res = append(res, getClothesGeneAttribute(gStr, configService))
+	res = append(res, getTrackGeneAttribute(gStr, configService))
+	res = append(res, getVortexGeneAttribute(gStr, configService))
 	res = append(res, getEyesGeneAttribute(gStr, configService))
-	res = append(res, getHeadGeneAttribute(gStr, configService))
+	res = append(res, getMouthGeneAttribute(gStr, configService))
+	res = append(res, getNecklaceGeneAttribute(gStr, configService))
+	res = append(res, getSkinGeneAttribute(gStr, configService))
 	res = append(res, getBackgroundGeneAttribute(gStr, configService))
 	return res
 }
@@ -222,7 +229,6 @@ func (g *Genome) attributes(configService *config.ConfigService) []interface{} {
 func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) Metadata {
 	var m Metadata
 	genes := g.genes()
-
 	m.Attributes = g.attributes(configService)
 	m.Name = g.name(configService, tokenId)
 	m.Description = g.description(configService, tokenId)
@@ -239,12 +245,9 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 	geneUrl := b.String()
 
 	imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
-	if !imageExists {
-		GenerateAndSaveImage(genes)
-	}
-
 	videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
-	if !videoExists {
+	if !imageExists || !videoExists {
+		GenerateAndSaveImage(genes)
 		GenerateAndSaveVideo(genes)
 	}
 
