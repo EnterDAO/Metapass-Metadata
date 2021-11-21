@@ -2,6 +2,7 @@ package metadata
 
 import (
 	"context"
+	"fmt"
 	"image"
 	"image/color"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 const IMG_SIZE = 4000
 const GCLOUD_UPLOAD_BUCKET_NAME = "metapass-images"
 const GCLOUD_SOURCE_BUCKET_NAME = "metapass-source-images"
+const BUCKET_BASE_PATH = "./dev"
 
 func resourceExists(imageURL string) bool {
 	resp, err := http.Get(imageURL)
@@ -53,7 +55,6 @@ func combineRemoteImages(bucket *storage.BucketHandle, basePath string, overlayP
 		}
 		dst = imaging.Overlay(dst, o, image.Pt(0, 0), 1)
 	}
-
 	return dst
 }
 
@@ -89,8 +90,42 @@ func saveToGCloud(i *image.NRGBA, name string) {
 }
 
 func GenerateAndSaveImage(genes []string) {
-	overlayTraits(traitsToCombine)
-	log.Println("Overlayed images")
+	traitPaths := make([]string, len(genes) - 1)
+
+	for i, gene := range genes {
+		attrBucketName := ""
+		switch i {
+		case 0:
+			attrBucketName = "backgrounds-image"
+		case 1:
+			attrBucketName = "skins"
+		case 2:
+			attrBucketName = "necklaces"
+		case 3:
+			attrBucketName = "mouth"
+		case 4:
+			attrBucketName = "eyes"
+		case 5:
+			attrBucketName = "vortex"
+		case 6:
+			attrBucketName = "tracks"
+			continue
+		}
+
+		traitPaths[i] = fmt.Sprintf("%s/%v/%s.png", BUCKET_BASE_PATH, attrBucketName, gene)
+	}
+
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+
+	if err != nil {
+		log.Errorf("storage.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	bucket := client.Bucket(GCLOUD_SOURCE_BUCKET_NAME)
+
+	image := combineRemoteImages(bucket, traitPaths[0], traitPaths[1:]...)
 
 	b := strings.Builder{}
 
@@ -100,5 +135,59 @@ func GenerateAndSaveImage(genes []string) {
 
 	b.WriteString(".jpg") // Finish with jpg extension
 
-	saveVideoToGCloud(outOverlayedImgPath, b.String())
+	saveToGCloud(image, b.String())
+
+	log.Println("Uploaded trippy image to bucket!")
+}
+
+func GenerateAndSaveImageForVideo(genes []string) {
+	traitPaths := make([]string, len(genes) - 2)
+
+	for i, gene := range genes {
+		attrBucketName := ""
+		switch i {
+		case 0:
+			attrBucketName = "backgrounds-image"
+			continue
+		case 1:
+			attrBucketName = "skins"
+		case 2:
+			attrBucketName = "necklaces"
+		case 3:
+			attrBucketName = "mouth"
+		case 4:
+			attrBucketName = "eyes"
+		case 5:
+			attrBucketName = "vortex"
+		case 6:
+			attrBucketName = "tracks"
+			continue
+		}
+		
+		traitPaths[i - 1] = fmt.Sprintf("%s/%v/%s.png", BUCKET_BASE_PATH, attrBucketName, gene)
+	}
+
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+
+	if err != nil {
+		log.Errorf("storage.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	bucket := client.Bucket(GCLOUD_SOURCE_BUCKET_NAME)
+
+	image := combineRemoteImages(bucket, traitPaths[0], traitPaths[1:]...)
+
+	b := strings.Builder{}
+
+	for _, gene := range genes {
+		b.WriteString(gene)
+	}
+
+	b.WriteString(".jpg") // Finish with jpg extension
+
+	imaging.Save(image, outOverlayedNoBackgroundImgPath)
+
+	log.Println("Saved trippy image in memory!")
 }

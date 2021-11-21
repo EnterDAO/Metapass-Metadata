@@ -47,9 +47,9 @@ type FloatAttribute struct {
 }
 
 func (g Gene) toPath() string {
-	if g < 10 {
-		return fmt.Sprintf("0%s", strconv.Itoa(int(g)))
-	}
+	// if g < 10 {
+	// 	return fmt.Sprintf("0%s", strconv.Itoa(int(g)))
+	// }
 
 	return strconv.Itoa(int(g))
 }
@@ -112,7 +112,7 @@ func getTrackGeneAttribute(g string, configService *config.ConfigService) String
 	gene := getTrackGene(g)
 	return StringAttribute{
 		TraitType: "Track",
-		Value:     configService.Track[gene],
+		Value:     configService.Tracks[gene],
 	}
 }
 
@@ -128,7 +128,7 @@ func getNecklaceGeneAttribute(g string, configService *config.ConfigService) Str
 	gene := getNecklaceGene(g)
 	return StringAttribute{
 		TraitType: "Necklace",
-		Value:     configService.Necklace[gene],
+		Value:     configService.Necklaces[gene],
 	}
 }
 
@@ -143,14 +143,14 @@ func getSkinGeneAttribute(g string, configService *config.ConfigService) StringA
 	gene := getSkinGene(g)
 	return StringAttribute{
 		TraitType: "Skin",
-		Value:     configService.Skin[gene],
+		Value:     configService.Skins[gene],
 	}
 }
 func getBackgroundGeneAttribute(g string, configService *config.ConfigService) StringAttribute {
 	gene := getBackgroundGene(g)
 	return StringAttribute{
 		TraitType: "Background",
-		Value:     configService.Background[gene],
+		Value:     configService.Backgrounds[gene],
 	}
 }
 
@@ -189,11 +189,11 @@ func getBackgroundGenePath(g string) string {
 }
 
 func (g *Genome) name(configService *config.ConfigService, tokenId string) string {
-	return fmt.Sprintf("Sharded Mind #%v", tokenId)
+	return fmt.Sprintf("EnterDAO Sharded Minds #%v", tokenId)
 }
 
 func (g *Genome) description(configService *config.ConfigService, tokenId string) string {
-	return fmt.Sprintf("Sharded Minds is the most dope NFT collection!")
+	return "EnterDAO Sharded Minds is a collection of 5,000 audiovisual art-pieces created by Angela Pencheva and Raredub as contributors to EnterDAO"
 }
 
 func (g *Genome) genes() []string {
@@ -244,12 +244,13 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 
 	geneUrl := b.String()
 
-	imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
-	videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
-	if !imageExists || !videoExists {
-		GenerateAndSaveImage(genes)
-		GenerateAndSaveVideo(genes)
-	}
+	// imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
+	// videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
+	// if !imageExists || !videoExists {
+	// }
+	GenerateAndSaveImage(genes)
+	GenerateAndSaveImageForVideo(genes)
+	GenerateAndSaveVideo(genes)
 
 	m.Image = geneUrl + ".jpg"
 	m.Video = geneUrl + ".mp4"

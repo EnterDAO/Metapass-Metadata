@@ -8,13 +8,13 @@ import (
 )
 
 type ConfigService struct {
-	Skin       []string `json:"skin"`
-	Background []string `json:"background"`
+	Skins       []string `json:"skins"`
+	Backgrounds []string `json:"backgrounds"`
 	Mouth      []string `json:"mouth"`
 	Eyes       []string `json:"eyes"`
-	Track			 []string `json:"track"`
+	Tracks			 []string `json:"tracks"`
 	Vortex		 []string `json:"vortex"`
-	Necklace	 []string `json:"necklace"`
+	Necklaces	 []string `json:"necklaces"`
 }
 
 func NewConfigService(configPath string) *ConfigService {
