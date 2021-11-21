@@ -2,6 +2,9 @@ package metadata
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -226,6 +229,26 @@ func (g *Genome) attributes(configService *config.ConfigService) []interface{} {
 	return res
 }
 
+func TriggerVideoGeneration(id string, genes []string) {
+	generatorEndpoint := os.Getenv("GENERATOR_ENDPOINT")
+	videoUrl := fmt.Sprintf("%s/backgrounds-video/%s.mp4", BUCKET_BASE_PATH, genes[0])
+	trackUrl := fmt.Sprintf("%s/tracks/%s.wav", BUCKET_BASE_PATH, genes[len(genes) - 1])
+	imageUrl := strings.Builder{}
+
+	for _, gene := range genes {
+		imageUrl.WriteString(gene)
+	}
+
+	imageUrl.WriteString("-for-video.jpg")
+
+	resp, err := http.Get(fmt.Sprintf("%s?id=%s&trackUrl=%s&imagePath=%s&videopath=%s&genes=%s", generatorEndpoint, id, trackUrl, imageUrl, videoUrl, genes))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Println(resp)
+
+}
+
 func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) Metadata {
 	var m Metadata
 	genes := g.genes()
@@ -244,13 +267,15 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 
 	geneUrl := b.String()
 
-	// imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
+	imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
 	// videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
-	// if !imageExists || !videoExists {
-	// }
-	GenerateAndSaveImage(genes)
-	GenerateAndSaveImageForVideo(genes)
-	GenerateAndSaveVideo(genes)
+	if !imageExists {
+		GenerateAndSaveImage(genes)
+		GenerateAndSaveImageForVideo(genes)
+		// TriggerVideoGeneration(tokenId, genes)
+	}
+	// GenerateAndSaveImageForVideo(genes)
+	// GenerateAndSaveVideo(genes)
 
 	m.Image = geneUrl + ".jpg"
 	m.Video = geneUrl + ".mp4"

@@ -185,9 +185,9 @@ func GenerateAndSaveImageForVideo(genes []string) {
 		b.WriteString(gene)
 	}
 
-	b.WriteString(".jpg") // Finish with jpg extension
+	b.WriteString("-for-video.jpg") // Finish with jpg extension
 
-	imaging.Save(image, outOverlayedNoBackgroundImgPath)
+	saveToGCloud(image, b.String())
 
-	log.Println("Saved trippy image in memory!")
+	log.Println("Uploaded trippy image for video to bucket!")
 }

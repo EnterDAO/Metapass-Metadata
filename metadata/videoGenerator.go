@@ -96,17 +96,6 @@ func overlayTraits(traitPaths []string) {
 	// ffmpeg -i ./in/blue-fur.png -i ./in/shark-teeth-chain.png -i ./in/black-gas-mask.png -i ./in/cat-eyes.png -i ./in/daimunds.png -filter_complex "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[v]" -map "[v]" ./out/combined.png
 	// ffmpeg -i ./in/woman.png -i ./in/shark-teeth-chain.png -i ./in/gas-mask.png -i ./in/glasses.png -i ./in/eth.png -filter_complex "[0][1]overlay[bg0];[bg0][2]overlay[bg1];[bg1][3]overlay[bg2];[bg2][4]overlay[v]" -map "[v]" ./out/combined2.png
 	
-	// extractBackgroundFrame := exec.Command("ffmpeg", "-y",
-	// 	"-i", inBackgroundVideoPath, 
-	// 	"-vf", "select=eq(n\\,1)",
-	// 	"-vframes", "1",
-	// 	outBackgroundImagePath,
-	// )
-
-	// err := extractBackgroundFrame.Run()
-	// if err != nil {
-	// 	log.Fatalf(err.Error())
-	// }
 	// // First time we include the background frame to have the full image
 	overlayParams := []string{}
 	overlayParams = append(overlayParams, "-y")
