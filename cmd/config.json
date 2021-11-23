@@ -1,35 +1,48 @@
 {
 	"skins": [
-    "Base",
+    "Base Skin",
     "Black Fur",
+    "Blue Fur",
+    "Leopard Fur",
+    "Normal Fur",
+    "Pierced Skin",
     "Pink Fur",
-    "Leo Fur",
-    "Kinda Fur",
-    "Pierced",
-    "Purpe Fur",
-    "Tatooed"
+    "Robot Skin",
+    "Tatooed Skin"
 	],
 	"mouth": [
-    "Black mouth",
-    "Moustaches",
+    "Black Mouth",
     "Black Gas Mask",
-    "Pink Gas Mask"
+    "Colored Gas Mask",
+    "Red Pill",
+    "Saberteeth"
   ],
 	"necklaces": [
-    "Enter Bandana",
-    "Silver Chain",
-    "Gold Chain",
-    "Choker",
-    "Killer Chain"
+    "EnterDAO Bandana",
+    "Beads",
+    "Clown Charles",
+    "Diamond Chains",
+    "Diamond Choker",
+    "Dog Tag",
+    "GM Chain",
+    "Gold Chains",
+    "Leather Choker",
+    "Magic Stone Necklace",
+    "Nintendo Chain",
+    "Shark Teeth",
+    "WAGMI Choker"
   ],
   "eyes": [
-    "Black eyes",
-    "Cool eyes",
-    "Predator eyes",
-    "Angel eyes",
-    "Blue Shades",
-    "Melting eyes",
-    "White eyes",
+    "3rd Eye",
+    "Alien Eyes",
+    "Black Eyes",
+    "Cat Eyes",
+    "Glowing Eyes",
+    "Heart Glasses",
+    "Melting Eyes",
+    "Robot Eyes",
+    "Terminator Eyes",
+    "Trippy Eyes",
     "VR"
   ],
 	"tracks": [
@@ -54,11 +67,24 @@
     "Background 7",
     "Background 8",
     "Background 9",
-    "Background 10"
+    "Background 10",
+    "Background 11",
+    "Background 12",
+    "Background 13",
+    "Background 14",
+    "Background 15",
+    "Background 16",
+    "Background 17",
+    "Background 18"
   ],
 	"vortex": [
+    "Aave Ghost",
+    "Corn Gun",
     "Diamonds",
-    "ETH",
-    "Pac-Man"
+    "Ethereum",
+    "Matrix Code",
+    "Pac-Man",
+    "Squiggle Circled",
+    "Squiggle Gradient"
   ]
 }

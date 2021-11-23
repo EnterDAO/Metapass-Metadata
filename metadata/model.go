@@ -15,21 +15,21 @@ const METAPASS_IMAGE_URL string = "https://storage.googleapis.com/metapass-image
 const EXTERNAL_URL string = "https://enterdao.xyz/metapass/"
 const GENES_COUNT = 7
 
-const SKIN_GENE_COUNT int = 8
-const MOUTH_GENE_COUNT int = 4
-const NECKLACES_GENE_COUNT int = 5
-const EYES_GENES_COUNT int = 8
+const SKIN_GENE_COUNT int = 9
+const MOUTH_GENE_COUNT int = 5
+const NECKLACES_GENE_COUNT int = 10
+const EYES_GENES_COUNT int = 11
 const TRACKS_GENES_COUNT int = 10
-const BACKGROUND_GENE_COUNT int = 10
-const VORTEX_GENE_COUNT = 3
+const BACKGROUND_GENE_COUNT int = 18
+const VORTEX_GENE_COUNT = 8
 
-var SKIN_DISITRIBUTION [SKIN_GENE_COUNT]int = [SKIN_GENE_COUNT]int{1250,1250,1250,1250,1250,1250,1250,1250}
-var MOUTH_DISITRIBUTION [MOUTH_GENE_COUNT]int = [MOUTH_GENE_COUNT]int{2500,2500,2500,2500}
-var NECKLACES_DISTRIBUTION [NECKLACES_GENE_COUNT]int = [NECKLACES_GENE_COUNT]int{2000,2000,2000,2000,2000}
-var EYES_DISTRIBUTION [EYES_GENES_COUNT]int = [EYES_GENES_COUNT]int{1250,1250,1250,1250,1250,1250,1250,1250}
+var SKIN_DISITRIBUTION [SKIN_GENE_COUNT]int = [SKIN_GENE_COUNT]int{1111,1111,1111,1111,1111,1111,1111,1112}
+var MOUTH_DISITRIBUTION [MOUTH_GENE_COUNT]int = [MOUTH_GENE_COUNT]int{2000,2000,2000,2000,2000}
+var NECKLACES_DISTRIBUTION [NECKLACES_GENE_COUNT]int = [NECKLACES_GENE_COUNT]int{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000}
+var EYES_DISTRIBUTION [EYES_GENES_COUNT]int = [EYES_GENES_COUNT]int{909,909,909,909,909,909,909,909,909,909,910}
 var TRACKS_DISTRIBUTION [TRACKS_GENES_COUNT]int = [TRACKS_GENES_COUNT]int{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000}
-var BACKGROUND_DISTRIBUTION [BACKGROUND_GENE_COUNT]int = [BACKGROUND_GENE_COUNT]int{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000}
-var VORTEX_DISTRIBUTION [VORTEX_GENE_COUNT]int = [VORTEX_GENE_COUNT]int{3333,3333,3334}
+var BACKGROUND_DISTRIBUTION [BACKGROUND_GENE_COUNT]int = [BACKGROUND_GENE_COUNT]int{555,555,555,555,555,555,555,555,555,555,555,555,555,555,555,555,555,565}
+var VORTEX_DISTRIBUTION [VORTEX_GENE_COUNT]int = [VORTEX_GENE_COUNT]int{1250,1250,1250,1250,1250,1250,1250,1250}
 
 type Genome string
 type Gene int
@@ -50,10 +50,6 @@ type FloatAttribute struct {
 }
 
 func (g Gene) toPath() string {
-	// if g < 10 {
-	// 	return fmt.Sprintf("0%s", strconv.Itoa(int(g)))
-	// }
-
 	return strconv.Itoa(int(g))
 }
 
@@ -233,15 +229,12 @@ func TriggerVideoGeneration(id string, genes []string) {
 	generatorEndpoint := os.Getenv("GENERATOR_ENDPOINT")
 	videoUrl := fmt.Sprintf("%s/backgrounds-video/%s.mp4", BUCKET_BASE_PATH, genes[0])
 	trackUrl := fmt.Sprintf("%s/tracks/%s.wav", BUCKET_BASE_PATH, genes[len(genes) - 1])
-	imageUrl := strings.Builder{}
 
-	for _, gene := range genes {
-		imageUrl.WriteString(gene)
-	}
+	imageUrl := fmt.Sprintf("%s-for-video.jpg", strings.Join(genes[:], ""))
+	finalVideoName := fmt.Sprintf("%s.mp4", strings.Join(genes[:], ""))
 
-	imageUrl.WriteString("-for-video.jpg")
-
-	resp, err := http.Get(fmt.Sprintf("%s?id=%s&trackUrl=%s&imagePath=%s&videopath=%s&genes=%s", generatorEndpoint, id, trackUrl, imageUrl, videoUrl, genes))
+	endpoint := fmt.Sprintf("%s?id=%s&trackUrl=%s&imageUrl=%s&backgroundUrl=%s&finalVideoName=%s", generatorEndpoint, id, trackUrl, imageUrl, videoUrl, finalVideoName)
+	resp, err := http.Get(endpoint)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -269,13 +262,16 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 
 	imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
 	// videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
+	videoImageExists := resourceExists(fmt.Sprintf("%s-for-video.jpg", geneUrl))
 	if !imageExists {
 		GenerateAndSaveImage(genes)
-		GenerateAndSaveImageForVideo(genes)
-		// TriggerVideoGeneration(tokenId, genes)
 	}
-	// GenerateAndSaveImageForVideo(genes)
-	// GenerateAndSaveVideo(genes)
+	if !videoImageExists {
+		GenerateAndSaveImageForVideo(genes)		
+	}
+	// if !videoExists {
+	// 	TriggerVideoGeneration(tokenId, genes)
+	// }
 
 	m.Image = geneUrl + ".jpg"
 	m.Video = geneUrl + ".mp4"

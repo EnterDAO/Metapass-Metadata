@@ -13,10 +13,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const IMG_SIZE = 4000
+const IMG_SIZE = 2000
 const GCLOUD_UPLOAD_BUCKET_NAME = "metapass-images"
 const GCLOUD_SOURCE_BUCKET_NAME = "metapass-source-images"
-const BUCKET_BASE_PATH = "./dev"
+const BUCKET_BASE_PATH = "./dev-new"
 
 func resourceExists(imageURL string) bool {
 	resp, err := http.Get(imageURL)
