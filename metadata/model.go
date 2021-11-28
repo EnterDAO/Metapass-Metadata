@@ -3,12 +3,13 @@ package metadata
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/lobster-metadata/config"
+	"github.com/lobster-metadata/db"
 )
 
 const METAPASS_IMAGE_URL string = "https://storage.googleapis.com/metapass-images/"
@@ -225,22 +226,6 @@ func (g *Genome) attributes(configService *config.ConfigService) []interface{} {
 	return res
 }
 
-func TriggerVideoGeneration(id string, genes []string) {
-	generatorEndpoint := os.Getenv("GENERATOR_ENDPOINT")
-	videoUrl := fmt.Sprintf("%s/backgrounds-video/%s.mp4", BUCKET_BASE_PATH, genes[0])
-	trackUrl := fmt.Sprintf("%s/tracks/%s.wav", BUCKET_BASE_PATH, genes[len(genes) - 1])
-
-	imageUrl := fmt.Sprintf("%s-for-video.jpg", strings.Join(genes[:], ""))
-	finalVideoName := fmt.Sprintf("%s.mp4", strings.Join(genes[:], ""))
-
-	endpoint := fmt.Sprintf("%s?id=%s&trackUrl=%s&imageUrl=%s&backgroundUrl=%s&finalVideoName=%s", generatorEndpoint, id, trackUrl, imageUrl, videoUrl, finalVideoName)
-	resp, err := http.Get(endpoint)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Println(resp)
-
-}
 
 func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) Metadata {
 	var m Metadata
@@ -260,21 +245,48 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 
 	geneUrl := b.String()
 
+	m.Image = geneUrl + ".jpg"
+	m.Video = geneUrl + ".mp4"
+
+	forVideoImageUrl := fmt.Sprintf("%s-for-video.png", geneUrl)
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file: " + err.Error())
+	}
+
+	dbName := os.Getenv("QUEUE_DB")
+	queueCollection := os.Getenv("QUEUE_COLLECTION")
+	
+	videoImageExists  := resourceExists(forVideoImageUrl)
 	imageExists := resourceExists(fmt.Sprintf("%s.jpg", geneUrl))
-	// videoExists := resourceExists(fmt.Sprintf("%s.mp4", geneUrl))
-	videoImageExists := resourceExists(fmt.Sprintf("%s-for-video.jpg", geneUrl))
+
+	videoExists := db.CheckVideoIsQueuedForGeneration(dbName, queueCollection, tokenId)
+
 	if !imageExists {
 		GenerateAndSaveImage(genes)
 	}
 	if !videoImageExists {
 		GenerateAndSaveImageForVideo(genes)		
 	}
-	// if !videoExists {
-	// 	TriggerVideoGeneration(tokenId, genes)
-	// }
 
-	m.Image = geneUrl + ".jpg"
-	m.Video = geneUrl + ".mp4"
+	if !videoExists {
+		videoUrl := fmt.Sprintf("%s/backgrounds-video/%s.mp4", BUCKET_BASE_PATH, genes[0])
+		trackUrl := fmt.Sprintf("%s/tracks/%s.wav", BUCKET_BASE_PATH, genes[len(genes) - 1])
+		forVideoUrl := fmt.Sprintf("%s-for-video.png", strings.Join(genes[:], ""))
+		videoName := fmt.Sprintf("%s.mp4", strings.Join(genes[:], ""))
+		db.AddVideoForGeneration(db.VideoMetadata{
+			TokenId:        tokenId,
+			TrackUrl:       trackUrl,
+			BackgroundUrl:  videoUrl,
+			ImageUrl:       forVideoUrl,
+			FinalVideoName: videoName,
+			IsGenerated:    false,
+			IsGenerating:   false,
+			HasErrored:     false,
+		})
+	}
+
 	return m
 }
 

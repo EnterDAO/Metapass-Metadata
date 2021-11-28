@@ -11,5 +11,6 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/sirupsen/logrus v1.7.0
+	go.mongodb.org/mongo-driver v1.8.0 // indirect
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d // indirect
 )

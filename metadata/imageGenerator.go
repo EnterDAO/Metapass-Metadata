@@ -66,7 +66,7 @@ func reverseGenesOrder(genes []string) []string {
 	return res
 }
 
-func saveToGCloud(i *image.NRGBA, name string) {
+func saveToGCloud(i *image.NRGBA, name string, imageFormat imaging.Format) {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 
@@ -77,7 +77,7 @@ func saveToGCloud(i *image.NRGBA, name string) {
 
 	bucket := client.Bucket(GCLOUD_UPLOAD_BUCKET_NAME).Object(name).NewWriter(ctx)
 
-	err = imaging.Encode(bucket, i, imaging.JPEG, imaging.JPEGQuality(80))
+	err = imaging.Encode(bucket, i, imageFormat)
 
 	if err != nil {
 		log.Errorf("Upload: %v", err)
@@ -135,7 +135,7 @@ func GenerateAndSaveImage(genes []string) {
 
 	b.WriteString(".jpg") // Finish with jpg extension
 
-	saveToGCloud(image, b.String())
+	saveToGCloud(image, b.String(), imaging.JPEG)
 
 	log.Println("Uploaded trippy image to bucket!")
 }
@@ -185,9 +185,9 @@ func GenerateAndSaveImageForVideo(genes []string) {
 		b.WriteString(gene)
 	}
 
-	b.WriteString("-for-video.jpg") // Finish with jpg extension
+	b.WriteString("-for-video.png") // Finish with jpg extension
 
-	saveToGCloud(image, b.String())
+	saveToGCloud(image, b.String(), imaging.PNG)
 
 	log.Println("Uploaded trippy image for video to bucket!")
 }
