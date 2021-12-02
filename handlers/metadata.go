@@ -7,16 +7,16 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/go-chi/render"
-	"github.com/lobster-metadata/config"
-	"github.com/lobster-metadata/contracts"
-	"github.com/lobster-metadata/dlt"
-	"github.com/lobster-metadata/metadata"
+	"github.com/metapass-metadata/config"
+	"github.com/metapass-metadata/contracts"
+	"github.com/metapass-metadata/dlt"
+	"github.com/metapass-metadata/metadata"
 	log "github.com/sirupsen/logrus"
 )
 
 func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, configService *config.ConfigService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		instance, err := contracts.NewLobster(common.HexToAddress(address), ethClient.Client)
+		instance, err := contracts.NewShardedMinds(common.HexToAddress(address), ethClient.Client)
 		if err != nil {
 			render.Status(r, 500)
 			render.JSON(w, r, err)
@@ -47,7 +47,7 @@ func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, config
 		} else {
 			render.JSON(w, r, Error{
 				Status:  404,
-				Message: "No lobster found"},
+				Message: "No Sharded Mind found"},
 			)
 		}
 	}

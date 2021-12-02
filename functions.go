@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/lobster-metadata/config"
-	"github.com/lobster-metadata/dlt"
-	"github.com/lobster-metadata/handlers"
+	"github.com/metapass-metadata/config"
+	"github.com/metapass-metadata/dlt"
+	"github.com/metapass-metadata/handlers"
 )
 
 func setCORS(w http.ResponseWriter, r *http.Request) (write http.ResponseWriter, response *http.Request) {

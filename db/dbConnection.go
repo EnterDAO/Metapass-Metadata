@@ -5,7 +5,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -33,11 +32,6 @@ func GetDbConnection() *mongo.Client {
 
 // ConnectToDb retrieves db config from .env and tries to conenct to the database.
 func ConnectToDb() *mongo.Client {
-	err := godotenv.Load()
-	if err != nil {
-		log.Errorln("Error loading .env file")
-	}
-
 	username := os.Getenv("USERNAME")
 	password := os.Getenv("PASSWORD")
 	dbUrl := os.Getenv("DB_URL")

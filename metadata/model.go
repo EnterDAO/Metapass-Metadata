@@ -2,35 +2,33 @@ package metadata
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/joho/godotenv"
-	"github.com/lobster-metadata/config"
-	"github.com/lobster-metadata/db"
+	"github.com/metapass-metadata/config"
+	"github.com/metapass-metadata/db"
 )
 
 const METAPASS_IMAGE_URL string = "https://storage.googleapis.com/metapass-images/"
-const EXTERNAL_URL string = "https://enterdao.xyz/metapass/"
+const EXTERNAL_URL string = "https://enterdao.xyz/sharded-mind/"
 const GENES_COUNT = 7
 
-const SKIN_GENE_COUNT int = 9
-const MOUTH_GENE_COUNT int = 5
-const NECKLACES_GENE_COUNT int = 10
-const EYES_GENES_COUNT int = 11
+const SKIN_GENE_COUNT int = 11
+const MOUTH_GENE_COUNT int = 16
+const NECKLACES_GENE_COUNT int = 16
+const EYES_GENES_COUNT int = 17
 const TRACKS_GENES_COUNT int = 10
 const BACKGROUND_GENE_COUNT int = 18
-const VORTEX_GENE_COUNT = 8
+const VORTEX_GENE_COUNT = 19
 
-var SKIN_DISITRIBUTION [SKIN_GENE_COUNT]int = [SKIN_GENE_COUNT]int{1111,1111,1111,1111,1111,1111,1111,1112}
-var MOUTH_DISITRIBUTION [MOUTH_GENE_COUNT]int = [MOUTH_GENE_COUNT]int{2000,2000,2000,2000,2000}
-var NECKLACES_DISTRIBUTION [NECKLACES_GENE_COUNT]int = [NECKLACES_GENE_COUNT]int{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000}
-var EYES_DISTRIBUTION [EYES_GENES_COUNT]int = [EYES_GENES_COUNT]int{909,909,909,909,909,909,909,909,909,909,910}
-var TRACKS_DISTRIBUTION [TRACKS_GENES_COUNT]int = [TRACKS_GENES_COUNT]int{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000}
-var BACKGROUND_DISTRIBUTION [BACKGROUND_GENE_COUNT]int = [BACKGROUND_GENE_COUNT]int{555,555,555,555,555,555,555,555,555,555,555,555,555,555,555,555,555,565}
-var VORTEX_DISTRIBUTION [VORTEX_GENE_COUNT]int = [VORTEX_GENE_COUNT]int{1250,1250,1250,1250,1250,1250,1250,1250}
+var SKIN_DISITRIBUTION [SKIN_GENE_COUNT]int = [SKIN_GENE_COUNT]int{200,200,240,300,503,503,504,504,600,600,840}
+var MOUTH_DISITRIBUTION [MOUTH_GENE_COUNT]int = [MOUTH_GENE_COUNT]int{50,94,200,225,240,250,250,250,275,300,350,400,400,420,500,790}
+var NECKLACES_DISTRIBUTION [NECKLACES_GENE_COUNT]int = [NECKLACES_GENE_COUNT]int{50,100,150,247,247,250,250,300,350,350,400,400,400,450,450,600}
+var EYES_DISTRIBUTION [EYES_GENES_COUNT]int = [EYES_GENES_COUNT]int{50,100,200,200,200,224,240,250,250,300,350,350,350,350,370,420,790}
+var TRACKS_DISTRIBUTION [TRACKS_GENES_COUNT]int = [TRACKS_GENES_COUNT]int{44,150,250,360,450,550,660,750,840,940}
+var BACKGROUND_DISTRIBUTION [BACKGROUND_GENE_COUNT]int = [BACKGROUND_GENE_COUNT]int{49,49,49,149,149,149,250,250,250,250,350,350,350,350,500,500,500,500}
+var VORTEX_DISTRIBUTION [VORTEX_GENE_COUNT]int = [VORTEX_GENE_COUNT]int{100,150,200,200,200,200,244,250,250,250,250,250,300,300,300,350,400,400,400}
 
 type Genome string
 type Gene int
@@ -246,14 +244,9 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 	geneUrl := b.String()
 
 	m.Image = geneUrl + ".jpg"
-	m.Video = geneUrl + ".mp4"
+	m.AnimationUrl = geneUrl + ".mp4"
 
 	forVideoImageUrl := fmt.Sprintf("%s-for-video.png", geneUrl)
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file: " + err.Error())
-	}
 
 	dbName := os.Getenv("QUEUE_DB")
 	queueCollection := os.Getenv("QUEUE_COLLECTION")
@@ -291,10 +284,10 @@ func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) M
 }
 
 type Metadata struct {
-	Description string      `json:"description"`
-	Name        string      `json:"name"`
-	Image       string      `json:"image"`
-	Video       string      `json:"video"`
-	Attributes  interface{} `json:"attributes"`
-	ExternalUrl string      `json:"external_url"`
+	Description  string      `json:"description"`
+	Name         string      `json:"name"`
+	Image        string      `json:"image"`
+	AnimationUrl string      `json:"animation_url"`
+	Attributes   interface{} `json:"attributes"`
+	ExternalUrl  string      `json:"external_url"`
 }

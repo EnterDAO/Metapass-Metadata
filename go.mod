@@ -1,4 +1,4 @@
-module github.com/lobster-metadata
+module github.com/metapass-metadata
 
 go 1.13
 

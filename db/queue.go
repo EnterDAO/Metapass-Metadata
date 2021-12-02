@@ -51,4 +51,5 @@ func AddVideoForGeneration(model VideoMetadata) {
 	if err != nil {
 		log.Error(err.Error())
 	}
+	log.Println("Queued video for generation")
 }

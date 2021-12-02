@@ -6,10 +6,10 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	"github.com/joho/godotenv"
-	"github.com/lobster-metadata/config"
-	"github.com/lobster-metadata/dlt"
-	"github.com/lobster-metadata/handlers"
-	"github.com/lobster-metadata/logger"
+	"github.com/metapass-metadata/config"
+	"github.com/metapass-metadata/dlt"
+	"github.com/metapass-metadata/handlers"
+	"github.com/metapass-metadata/logger"
 )
 
 func main() {	
