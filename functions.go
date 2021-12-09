@@ -31,5 +31,6 @@ func TokenMetadata(w http.ResponseWriter, r *http.Request) {
 	contractAddress := os.Getenv("CONTRACT_ADDRESS")
 
 	configService := config.NewConfigService("./serverless_function_source_code/config.json")
-	handlers.HandleMetadataRequest(ethClient, contractAddress, configService)(w, r)
+	uniqueConfigService := config.NewConfigService("./serverless_function_source_code/config-unique.json")
+	handlers.HandleMetadataRequest(ethClient, contractAddress, configService, uniqueConfigService)(w, r)
 }

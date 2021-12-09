@@ -35,10 +35,12 @@ func main() {
 	}
 	//Debug
 	// configService := config.NewConfigService("../config.json")
+	// uniqueConfigService := config.NewConfigService("../config-unique.json")
 	//Local
 	configService := config.NewConfigService("./config.json")
+	uniqueConfigService := config.NewConfigService("./config-unique.json")
 
-	funcframework.RegisterHTTPFunction("/token", handlers.HandleMetadataRequest(ethClient, contractAddress, configService))
+	funcframework.RegisterHTTPFunction("/token", handlers.HandleMetadataRequest(ethClient, contractAddress, configService, uniqueConfigService))
 
 	if err := funcframework.Start(port); err != nil {
 		log.Fatalf("funcframework.Start: %v\n", err)

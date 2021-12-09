@@ -88,7 +88,7 @@ func saveToGCloud(i *image.NRGBA, name string, imageFormat imaging.Format) {
 	}
 
 }
-
+//TODO: Change name to be unique so we don't have overlapping
 func GenerateAndSaveImage(genes []string) {
 	traitPaths := make([]string, len(genes) - 1)
 
@@ -96,19 +96,19 @@ func GenerateAndSaveImage(genes []string) {
 		attrBucketName := ""
 		switch i {
 		case 0:
-			attrBucketName = "backgrounds-image"
+			attrBucketName = backgroundsFolder
 		case 1:
-			attrBucketName = "skins"
+			attrBucketName = skinsFolder
 		case 2:
-			attrBucketName = "necklaces"
+			attrBucketName = necklacesFolder
 		case 3:
-			attrBucketName = "mouth"
+			attrBucketName = mouthFolder
 		case 4:
-			attrBucketName = "eyes"
+			attrBucketName = eyesFolder
 		case 5:
-			attrBucketName = "vortex"
+			attrBucketName = vortexFolder
 		case 6:
-			attrBucketName = "tracks"
+			attrBucketName = tracksFolder
 			continue
 		}
 
@@ -147,20 +147,20 @@ func GenerateAndSaveImageForVideo(genes []string) {
 		attrBucketName := ""
 		switch i {
 		case 0:
-			attrBucketName = "backgrounds-image"
+			attrBucketName = backgroundsFolder
 			continue
 		case 1:
-			attrBucketName = "skins"
+			attrBucketName = skinsFolder
 		case 2:
-			attrBucketName = "necklaces"
+			attrBucketName = necklacesFolder
 		case 3:
-			attrBucketName = "mouth"
+			attrBucketName = mouthFolder
 		case 4:
-			attrBucketName = "eyes"
+			attrBucketName = eyesFolder
 		case 5:
-			attrBucketName = "vortex"
+			attrBucketName = vortexFolder
 		case 6:
-			attrBucketName = "tracks"
+			attrBucketName = tracksFolder
 			continue
 		}
 		

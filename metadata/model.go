@@ -30,6 +30,14 @@ var TRACKS_DISTRIBUTION [TRACKS_GENES_COUNT]int = [TRACKS_GENES_COUNT]int{44,150
 var BACKGROUND_DISTRIBUTION [BACKGROUND_GENE_COUNT]int = [BACKGROUND_GENE_COUNT]int{49,49,49,149,149,149,250,250,250,250,350,350,350,350,500,500,500,500}
 var VORTEX_DISTRIBUTION [VORTEX_GENE_COUNT]int = [VORTEX_GENE_COUNT]int{100,150,200,200,200,200,244,250,250,250,250,250,300,300,300,350,400,400,400}
 
+const backgroundsFolder = "backgrounds-image"
+const skinsFolder = "skins"
+const necklacesFolder = "necklaces"
+const mouthFolder = "mouth"
+const eyesFolder = "eyes"
+const vortexFolder = "vortex"
+const tracksFolder = "tracks"
+
 type Genome string
 type Gene int
 type StringAttribute struct {
@@ -224,7 +232,7 @@ func (g *Genome) attributes(configService *config.ConfigService) []interface{} {
 	return res
 }
 
-
+// TODO: Check overlay order (https://enterdao.slack.com/archives/C02CD2N5TBK/p1638837850047000)
 func (g *Genome) Metadata(tokenId string, configService *config.ConfigService) Metadata {
 	var m Metadata
 	genes := g.genes()
