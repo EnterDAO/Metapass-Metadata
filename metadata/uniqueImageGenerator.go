@@ -13,7 +13,7 @@ import (
 func GenerateAndSaveUniqueImage(geneUrl string, uniqueIndex int64) {
 	traitPaths := make([]string, 2)
 
-	traitPaths[0] = fmt.Sprintf("%s/%s/%d.png", BUCKET_BASE_PATH, uniqueBackgroundsFolder, int(uniqueIndex))
+	traitPaths[0] = fmt.Sprintf("%s/%s/%d.png", BUCKET_BASE_PATH, uniqueBackgroundImagesFolder, int(uniqueIndex))
 	traitPaths[1] = fmt.Sprintf("%s/%s/%d.png", BUCKET_BASE_PATH, uniqueImagesFolder, int(uniqueIndex))
 
 	ctx := context.Background()

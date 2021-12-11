@@ -11,6 +11,7 @@ import (
 )
 const uniqueImagesFolder = "unique-images"
 const uniqueBackgroundsFolder = "unique-backgrounds"
+const uniqueBackgroundImagesFolder = "unique-background-images"
 const uniqueTracksFolder = "unique-tracks"
 
 func getUniqueMouthGeneAttribute(g string, configService *config.ConfigService, uniqueIndex int64) StringAttribute {
