@@ -38,7 +38,7 @@ func main() {
 	// uniqueConfigService := config.NewConfigService("../config-unique.json")
 	//Local
 	configService := config.NewConfigService("./config.json")
-	uniqueConfigService := config.NewConfigService("./config-unique.json")
+	uniqueConfigService := config.NewUniqueConfigService("./config-unique.json")
 
 	funcframework.RegisterHTTPFunction("/token", handlers.HandleMetadataRequest(ethClient, contractAddress, configService, uniqueConfigService))
 

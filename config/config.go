@@ -17,6 +17,10 @@ type ConfigService struct {
 	Necklaces	 []string `json:"necklaces"`
 }
 
+type UniqueConfigService struct {
+	Name []string `json:"name"`
+}
+
 func NewConfigService(configPath string) *ConfigService {
 	jsonFile, err := os.Open(configPath)
 	// if we os.Open returns an error then handle it
@@ -37,3 +41,25 @@ func NewConfigService(configPath string) *ConfigService {
 
 	return &service
 }
+
+func NewUniqueConfigService(configPath string) *UniqueConfigService {
+	jsonFile, err := os.Open(configPath)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println(err)
+	}
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	// we initialize our Users array
+	var service UniqueConfigService
+
+	// we unmarshal our byteArray which contains our
+	// jsonFile's content into 'users' which we defined above
+	json.Unmarshal(byteValue, &service)
+
+	return &service
+}
+

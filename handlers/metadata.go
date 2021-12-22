@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, configService *config.ConfigService, uniqueConfigService *config.ConfigService) func(w http.ResponseWriter, r *http.Request) {
+func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, configService *config.ConfigService, uniqueConfigService *config.UniqueConfigService) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		instance, err := contracts.NewShardedMinds(common.HexToAddress(address), ethClient.Client)
 		if err != nil {
