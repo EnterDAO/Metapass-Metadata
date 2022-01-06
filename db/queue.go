@@ -30,16 +30,22 @@ func CheckVideoIsQueuedForGeneration(dbName string, queueCollection string, toke
 		log.Error(err)
 	}
 
+	log.Println(collection.Name())
 	defer disconnectDB()
+	count, _ := collection.CountDocuments(context.Background(), bson.M{"tokenid": tokenId})
+	if count >= 1 {
+		log.Println(count)
+		log.Println("Is queued")
+		return true
+	}
 
-	res := collection.FindOne(context.Background(), bson.M{"tokenid": tokenId})
-
-	return res.Err() == nil
+	log.Println("Is not queued")
+	return false
 }
 
 func AddVideoForGeneration(model VideoMetadata) {
 	apiUrl := os.Getenv("QUEUE_BASE_URL")
-	endpoint := fmt.Sprintf("%s/add-video", apiUrl)
+	endpoint := fmt.Sprintf("%s/add-video", apiUrl)	
 
 	jsonModel, err := json.Marshal(model)
 	if err != nil {

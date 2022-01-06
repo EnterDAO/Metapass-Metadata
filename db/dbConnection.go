@@ -2,36 +2,26 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"os"
-	"sync"
 
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var once sync.Once
-var instance *mongo.Client
-
-// GetDbConnection returns an instance of a mongo db client. This is a singleton pattern in order to have only one alive connection to the database.
-//
-// If no connection exists, it will connect to database.
-//
-// If connection exists, it will return the instance of the database
-func GetDbConnection() *mongo.Client {
-	once.Do(func() {
-		client := ConnectToDb()
-		checkConnectionAndRestore(client)
-		instance = client
-	})
-
-	checkConnectionAndRestore(instance)
-	return instance
-}
+var client *mongo.Client
 
 // ConnectToDb retrieves db config from .env and tries to conenct to the database.
 func ConnectToDb() *mongo.Client {
+	if client != nil {
+		log.Println("Fetching existing client")
+		err := client.Ping(context.Background(), nil)
+		if err == nil {
+			return client
+		}	
+	}
+
 	username := os.Getenv("USERNAME")
 	password := os.Getenv("PASSWORD")
 	dbUrl := os.Getenv("DB_URL")
@@ -47,42 +37,42 @@ func ConnectToDb() *mongo.Client {
 	}
 
 	connectionStr := "mongodb+srv://" + username + ":" + password + "@" + dbUrl + "?retryWrites=true&w=majority"
-
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectionStr))
+	var err error
+	client, err = mongo.Connect(context.Background(), options.Client().ApplyURI(connectionStr))
 	if err != nil {
 		log.Errorln(err)
 	}
 
+	// check the connection
+	err = client.Ping(context.Background(), nil)
+	if err != nil {
+		log.Errorln(err)
+	}
+	log.Println("Connected to mongo client")
 	return client
-}
-
-// checkConnectionAndRestore ping the client and it throws and error, it tries to reconnect.
-func checkConnectionAndRestore(client *mongo.Client) {
-	err := client.Ping(context.Background(), readpref.Primary())
-
-	if err != nil {
-		log.Errorln(err)
-		newClient := ConnectToDb()
-		client = newClient
-	}
 }
 
 // GetMongoDbCollection accepts dbName and collectionname and returns an instance of the specified collection.
 func GetMongoDbCollection(DbName string, CollectionName string) (*mongo.Collection, error) {
-	client := GetDbConnection()
+	client := ConnectToDb()
 
 	collection := client.Database(DbName).Collection(CollectionName)
 	return collection, nil
 }
 
 func disconnectDB() {
-	client := ConnectToDb()
-	err := client.Disconnect(context.Background())
-	if err != nil {
-		log.Errorln(err)
-	} else {
-		log.Println("Connection to MongoDB closed.")
+	if client == nil {
+		return
 	}
+
+	err := client.Disconnect(context.TODO())
+	if err != nil {
+		log.Errorln("FAILED TO CLOSE Mongo Connection")
+		log.Errorln(err)
+	}
+
+	// TODO optional you can log your closed MongoDB client
+	fmt.Println("Connection to MongoDB closed.")
 
 }
 
