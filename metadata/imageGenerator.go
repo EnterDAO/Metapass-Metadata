@@ -16,7 +16,7 @@ import (
 const IMG_SIZE = 2000
 const GCLOUD_UPLOAD_BUCKET_NAME = "metapass-images"
 const GCLOUD_SOURCE_BUCKET_NAME = "metapass-source-images"
-const BUCKET_BASE_PATH = "./dev-staging"
+const BUCKET_BASE_PATH = "./prod"
 
 func resourceExists(imageURL string) bool {
 	resp, err := http.Get(imageURL)

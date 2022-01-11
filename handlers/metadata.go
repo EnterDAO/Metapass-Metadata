@@ -56,7 +56,7 @@ func HandleMetadataRequest(ethClient *dlt.EthereumClient, address string, config
 			if !isUnique {
 				render.JSON(w, r, (&g).Metadata(tokenId, configService))
 			} else {
-				render.JSON(w, r, (&g).UniqueMetadata(tokenId, uniqueIndex.Int64(), configService, uniqueConfigService))
+				render.JSON(w, r, (&g).UniqueMetadata(tokenId, uniqueIndex.Int64() - 1, configService, uniqueConfigService))
 			}
 		} else {
 			render.JSON(w, r, Error{
